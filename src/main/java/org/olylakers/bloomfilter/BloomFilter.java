@@ -9,6 +9,7 @@ import org.apache.commons.pool.impl.GenericObjectPool.Config;
 
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedis;
+import redis.clients.jedis.ShardedJedisPipeline;
 import redis.clients.jedis.ShardedJedisPool;
 
 /**
@@ -28,9 +29,17 @@ public class BloomFilter {
     private int bitSize;
     
     private ShardedJedisPool pool;
-    
-    private String defaultKey = "redis:bloomfilter";
-    private static final String hostConfig = "127.0.0.1:6001";
+
+    public ShardedJedisPool getPool() {
+        return pool;
+    }
+
+    public void setPool( ShardedJedisPool pool ) {
+        this.pool = pool;
+    }
+
+    private String defaultKey = "redis:bloomfilter:tqy";
+    private static final String hostConfig = "172.16.10.228:6381";
     
     public BloomFilter(String hosts, int timeout, float errorRate, int maxKey){
         this.hosts = hosts;
@@ -319,9 +328,31 @@ public class BloomFilter {
      */
     public static void main(String[] args) throws InterruptedException {
         // TODO Auto-generated method stub
-        
-        BloomFilter bloomFilter = new BloomFilter(hostConfig, 1000, 0.00000001f, (int)Math.pow(2, 31));
-        System.out.println(bloomFilter.getBitSize()/8/1024/2014);
+
+        BloomFilter bloomFilter = new BloomFilter(hostConfig, 1000, 0.00000001f, 64);
+
+        int[] offset1 = HashUtils.murmurHashOffset(1, bloomFilter.hashFunctionCount, bloomFilter.bitSize);
+        int[] offset2 = HashUtils.murmurHashOffset(2, bloomFilter.hashFunctionCount, bloomFilter.bitSize);
+        int count =0;
+        for(int i:offset1){
+            System.out.println(i);
+            count++;
+        }
+        System.out.println("................");
+        for(int i:offset2){
+            System.out.println(i);
+            count++;
+        }
+        bloomFilter.getPool().getResource().del(bloomFilter.defaultKey);
+        bloomFilter.add(1);
+        bloomFilter.add(1);
+        bloomFilter.add(1);
+        bloomFilter.add(1);
+        bloomFilter.add(1);
+        bloomFilter.add(2);
+        System.out.println("count"+count);
+        System.out.println(bloomFilter.count(bloomFilter.defaultKey));
+//        System.out.println(bloomFilter.getBitSize()/8/1024/2014);
     }
 
 }

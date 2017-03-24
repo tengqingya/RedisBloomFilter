@@ -1,4 +1,4 @@
-package com.taobao.tpn.count.bloomfilter;
+package org.olylakers.cBloomfilter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author hantong
  * 
  */
-public final class CountingBloomFilter {
+public final class CBloomFilter {
 
 	private final static int seed32 = 89478583;
 	private final static int HASH_LOCK_SIZE = 16;
@@ -51,7 +51,7 @@ public final class CountingBloomFilter {
 	 */
 	private final static long BUCKET_MAX_VALUE = 15;
 
-	public CountingBloomFilter() {
+	public CBloomFilter() {
 	}
 
 	/**
@@ -59,7 +59,7 @@ public final class CountingBloomFilter {
 	 * @param maxBitSize
 	 * @param hashFunctionNum
 	 */
-	public CountingBloomFilter(int maxBitSize, int hashFunctionNum) {
+	public CBloomFilter( int maxBitSize, int hashFunctionNum) {
 		buckets = new long[buckets2words(maxBitSize)];
 		this.maxBitSize = maxBitSize;
 		this.k = hashFunctionNum;
@@ -72,7 +72,7 @@ public final class CountingBloomFilter {
 	 * @param maxExceptNum
 	 * @param errorRate
 	 */
-	public CountingBloomFilter(double maxExceptNum, float errorRate) {
+	public CBloomFilter( double maxExceptNum, float errorRate) {
 		this.maxBitSize = optimalM(maxExceptNum, errorRate);
 		this.k = optimalK(maxExceptNum, maxBitSize);
 		buckets = new long[buckets2words(maxBitSize)];
